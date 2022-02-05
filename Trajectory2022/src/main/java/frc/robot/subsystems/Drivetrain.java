@@ -105,8 +105,8 @@ public class Drivetrain extends SubsystemBase {
     @Override
     public void periodic() {
         // Put code here to be run every loop
-        SmartDashboard.putNumber("Drive Train/left", leftFrontMotor.getSelectedSensorPosition(0));
-        SmartDashboard.putNumber("Drive Train/right", rightFrontMotor.getSelectedSensorPosition(0));
+        SmartDashboard.putNumber("Drive left", leftFrontMotor.getSelectedSensorPosition(0));
+        SmartDashboard.putNumber("Drive right", rightFrontMotor.getSelectedSensorPosition(0));
         m_odometry.update(Rotation2d.fromDegrees(getHeading()),
                 leftFrontMotor.getSelectedSensorPosition(0) * DriveConstants.kEncoderDistancePerPulse,
                 rightFrontMotor.getSelectedSensorPosition(0) * DriveConstants.kEncoderDistancePerPulse);
