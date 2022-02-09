@@ -42,6 +42,7 @@ public class Drivetrain extends SubsystemBase {
 
     // The gyro sensor
     private final AHRS m_gyro = new AHRS(Port.kUSB);
+    private double gyroOffset = 0;
 
     // Odometry class for tracking robot pose
     public final DifferentialDriveOdometry m_odometry;
@@ -107,6 +108,9 @@ public class Drivetrain extends SubsystemBase {
         // Put code here to be run every loop
         SmartDashboard.putNumber("Drive left", leftFrontMotor.getSelectedSensorPosition(0));
         SmartDashboard.putNumber("Drive right", rightFrontMotor.getSelectedSensorPosition(0));
+        SmartDashboard.putNumber("POSE X", getPose().getX());
+        SmartDashboard.putNumber("POSE Y", getPose().getY());
+
         m_odometry.update(Rotation2d.fromDegrees(getHeading()),
                 leftFrontMotor.getSelectedSensorPosition(0) * DriveConstants.kEncoderDistancePerPulse,
                 rightFrontMotor.getSelectedSensorPosition(0) * DriveConstants.kEncoderDistancePerPulse);
@@ -332,8 +336,10 @@ public class Drivetrain extends SubsystemBase {
     public void tankDriveVolts(double leftVolts, double rightVolts) {
         m_leftMotors.setVoltage(leftVolts);
         m_rightMotors.setVoltage(rightVolts);
-        SmartDashboard.putNumber("Left Encoder", leftFrontMotor.getSelectedSensorPosition());
-        SmartDashboard.putNumber("Right Encoder", rightFrontMotor.getSelectedSensorPosition());
+        SmartDashboard.putNumber("Left Encoder", leftFrontMotor.getSelectedSensorPosition(0));
+        SmartDashboard.putNumber("Right Encoder", rightFrontMotor.getSelectedSensorPosition(0));
+        SmartDashboard.putNumber("HEADING", m_odometry.getPoseMeters().getRotation().getDegrees());
+        
         // m_diffDrive.feed();
     }
 
@@ -354,7 +360,8 @@ public class Drivetrain extends SubsystemBase {
      * Zeroes the heading of the robot.
      */
     public void zeroHeading() {
-        m_gyro.reset();
+        //m_gyro.reset();
+        gyroOffset = m_gyro.getAngle();
     }
 
     /**
@@ -363,7 +370,8 @@ public class Drivetrain extends SubsystemBase {
      * @return the robot's heading in degrees, from -180 to 180
      */
     public double getHeading() {
-        return m_gyro.getRotation2d().getDegrees();
+        return m_gyro.getRotation2d().getDegrees() - gyroOffset;
+        //return new Rotation2d(m_gyro.getAngle()).getDegrees();
         // return Math.IEEEremainder(m_gyro.getAngle(), 360) *
         // (DriveConstants.kGyroReversed ? -1.0 : 1.0);
     }

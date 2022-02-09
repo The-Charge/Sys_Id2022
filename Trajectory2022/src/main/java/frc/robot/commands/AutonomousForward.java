@@ -20,6 +20,7 @@ import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
@@ -100,6 +101,8 @@ public class AutonomousForward extends SequentialCommandGroup {
                 // Pass config
                 config);
 
+        m_drivetrain.resetOdometry(exampleTrajectory.getInitialPose());
+
         RamseteCommand ramseteCommand = new RamseteCommand(exampleTrajectory, m_drivetrain::getPose,
                 new RamseteController(AutoConstants.kRamseteB, AutoConstants.kRamseteZeta),
                 new SimpleMotorFeedforward(DriveConstants.ksVolts, DriveConstants.kvVoltSecondsPerMeter,
@@ -114,6 +117,7 @@ public class AutonomousForward extends SequentialCommandGroup {
     }
 
     public Command getAutonomousBackward() {
+
 
         // Create a voltage constraint to ensure we don't accelerate too fast
         var autoVoltageConstraint = new DifferentialDriveVoltageConstraint(
@@ -140,32 +144,34 @@ public class AutonomousForward extends SequentialCommandGroup {
                 new Pose2d(0, 0, new Rotation2d(0)),
                 // Pass through these two interior waypoints, making an 's' curve path
                 List.of(
-                // new Translation2d(3, 0)
+                //new Translation2d(2.5, 1)
                 // new Translation2d(5, -1),
                 // new Translation2d(5, -1)
                 ),
                 // End 3 meters straight ahead of where we started, facing forward
-                new Pose2d(2, 0, new Rotation2d(0)),
+                new Pose2d(5, 0, new Rotation2d(Math.PI/2)),
                 // Pass config
                 config);
 
-        Trajectory exampleTrajectory1 = TrajectoryGenerator.generateTrajectory(
-                // Start at the origin facing the +X direction
-                new Pose2d(2, 0, new Rotation2d(0)),
-                // Pass through these two interior waypoints, making an 's' curve path
-                List.of(
-                // new Translation2d(3, 0)
-                // new Translation2d(5, -1),
-                // new Translation2d(5, -1)
-                ),
-                // End 3 meters straight ahead of where we started, facing forward
-                new Pose2d(4, 0, new Rotation2d(0)),
-                // Pass config
-                config);
+        // Trajectory exampleTrajectory1 = TrajectoryGenerator.generateTrajectory(
+        //         // Start at the origin facing the +X direction
+        //         new Pose2d(2, 0, new Rotation2d(0)),
+        //         // Pass through these two interior waypoints, making an 's' curve path
+        //         List.of(
+        //         // new Translation2d(3, 0)
+        //         // new Translation2d(5, -1),
+        //         // new Translation2d(5, -1)
+        //         ),
+        //         // End 3 meters straight ahead of where we started, facing forward
+        //         new Pose2d(4, 0, new Rotation2d(0)),
+        //         // Pass config
+        //         config);
 
-        Trajectory traj = exampleTrajectory.concatenate(exampleTrajectory1);
+        // Trajectory traj = exampleTrajectory.concatenate(exampleTrajectory1);
 
-        RamseteCommand ramseteCommand = new RamseteCommand(traj, m_drivetrain::getPose,
+        m_drivetrain.resetOdometry(exampleTrajectory.getInitialPose());
+
+        RamseteCommand ramseteCommand = new RamseteCommand(exampleTrajectory, m_drivetrain::getPose,
                 new RamseteController(AutoConstants.kRamseteB, AutoConstants.kRamseteZeta),
                 new SimpleMotorFeedforward(DriveConstants.ksVolts, DriveConstants.kvVoltSecondsPerMeter,
                         DriveConstants.kaVoltSecondsSquaredPerMeter),
